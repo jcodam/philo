@@ -1,10 +1,14 @@
 NAME=philo
 
-OBF=
+SRC= philo_main.c philo_list.c philo_error1.c
 
-HEADER=
+OBF= $(SRC:.c=.o)
 
-UTIL=
+HEADER= philo_all.h
+
+UTIL1= ft_atoi.c 
+
+UTIL= $(UTIL1:.c=.o)
 
 CC= gcc
 
@@ -18,19 +22,19 @@ pr:
 	$(CC) $(CFLAGS) practes practes.c
 
 pf:
-	rm practes
+	rm -f practes
 
-$(NAME): $(OBF)
+$(NAME): $(OBF) $(UTIL)
 	$(CC) $(CFLAGS) $@ $^
 
 %.o: %.c $(HEADER)
 	$(CC) -c $(CFLAGS) $@ $<
 
 clean:
-	rm -f $(OBF)
+	rm -f $(OBF) $(UTIL)
 
 fclean:
-	rm -f $(OBF) $(NAME)
+	rm -f $(OBF) $(UTIL) $(NAME)
 
 f: fclean
 
@@ -38,4 +42,13 @@ re:
 	$(MAKE) fclean
 	$(MAKE) all
 
-.PHONY: all clean fclean f re
+run:
+	./$(NAME) 5 500 100 200
+
+bug:
+	lldb $(NAME)
+
+Norm:
+	norminette $(SRC) $(UTIL1) $(HEADER)
+
+.PHONY: all clean fclean f re Norm
