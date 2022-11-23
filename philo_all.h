@@ -6,7 +6,7 @@
 /*   By: jbax <jbax@student.codam.nl>                 +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/11/15 15:34:52 by jbax          #+#    #+#                 */
-/*   Updated: 2022/11/18 17:49:38 by jbax          ########   odam.nl         */
+/*   Updated: 2022/11/23 15:15:59 by jbax          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@
 # include <pthread.h>
 # include <stdio.h>
 # include <stdlib.h>
+# include <sys/time.h>
 
 typedef struct s_philo_time
 {
@@ -36,9 +37,12 @@ typedef struct s_philo_list
 	struct s_philo_list	*back;
 	int					philo_id;
 	int					*sync;
+	pthread_mutex_t		*death;
+	int					last_meal;
 	pthread_t			thread_id;
 }				t_philo_list;
 
+int				time_new(int argc, char **argv, t_philo_time *ph);
 int				ft_atoi(const char *str);
 void			put_s(char *str);
 int				error_table(int error);

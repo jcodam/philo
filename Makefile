@@ -42,8 +42,11 @@ re:
 	$(MAKE) fclean
 	$(MAKE) all
 
+run1:
+	./$(NAME) 5 500 250 249 10
+
 run:
-	./$(NAME) 5 500 100 200
+	./$(NAME) 5 500 250 200 10
 
 bug:
 	lldb $(NAME)
