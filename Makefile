@@ -6,13 +6,15 @@ OBF= $(SRC:.c=.o)
 
 HEADER= philo_all.h
 
-UTIL1= ft_atoi.c 
+UTIL1= ft_atoi.c philo_util.c
 
 UTIL= $(UTIL1:.c=.o)
 
 CC= gcc
 
 CFLAGS= -g -Wall -Wextra -Werror -o
+
+SAN= -fsanitize=thread
 
 OO= -O3
 
@@ -34,19 +36,22 @@ clean:
 	rm -f $(OBF) $(UTIL)
 
 fclean:
-	rm -f $(OBF) $(UTIL) $(NAME)
+	@rm -f $(OBF) $(UTIL) $(NAME)
 
 f: fclean
 
 re:
-	$(MAKE) fclean
-	$(MAKE) all
+	@$(MAKE) fclean
+	@$(MAKE) all
 
 run1:
-	./$(NAME) 5 500 250 249 10
+	@./$(NAME) 5 700 250 249 10
 
 run:
-	./$(NAME) 5 500 250 200 10
+	@./$(NAME) 5 760 250 200 5
+
+run200:
+	@./$(NAME) 200 410 200 200
 
 bug:
 	lldb $(NAME)

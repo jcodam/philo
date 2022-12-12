@@ -6,7 +6,7 @@
 /*   By: jbax <jbax@student.codam.nl>                 +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/11/17 12:43:02 by jbax          #+#    #+#                 */
-/*   Updated: 2022/11/23 16:53:13 by jbax          ########   odam.nl         */
+/*   Updated: 2022/12/12 15:11:20 by jbax          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ int	time_new(int argc, char **argv, t_philo_time *ph)
 	if (argc == 6)
 		ph->x_eat = ft_atoi(argv[5]);
 	else
-		ph->x_eat = -1;
+		ph->x_eat = -3;
 	return (0);
 }
 
@@ -34,6 +34,7 @@ t_philo_list	*philo_new(t_philo_time *time, int id, int *synk)
 	if (!plist)
 		return (0);
 	plist->fork_left = malloc(sizeof(pthread_mutex_t));
+	plist->time_mutex = malloc(sizeof(pthread_mutex_t));
 	if (!death)
 	{
 		death = malloc(sizeof(pthread_mutex_t));
@@ -48,7 +49,49 @@ t_philo_list	*philo_new(t_philo_time *time, int id, int *synk)
 	plist->sync = synk;
 	if (pthread_mutex_init(plist->fork_left, 0))
 		return (0);
+	if (pthread_mutex_init(plist->time_mutex, 0))
+		return (0);
 	return (plist);
+}
+/*   1
+    / \
+   f   f
+  / .   \
+ 4 .     2
+  \ .   /
+   f   f
+    \ /
+     3
+*/
+
+int	philo_del(t_philo_list **plist)
+{
+	t_philo_list	*temp;
+
+	if (!*plist)
+		return (1);
+	temp = *plist;
+	if ((*plist)->next)
+	{
+		(*plist) = (*plist)->next;
+		if (temp->back)
+			(*plist)->back = temp->back;
+		else
+			(*plist)->back = 0;
+	}
+	else if (!temp->back)
+	{
+		pthread_mutex_destroy(temp->death);
+		free(temp->death);
+		*plist = 0;
+	}
+	pthread_mutex_destroy(temp->fork_left);
+	free(temp->fork_left);
+	pthread_mutex_destroy(temp->time_mutex);
+	free(temp->time_mutex);
+	free(temp);
+	temp = 0;
+	return (0);
 }
 
 void	philo_addback(t_philo_list **plist, t_philo_list *new)
@@ -64,7 +107,7 @@ void	philo_addback(t_philo_list **plist, t_philo_list *new)
 			temp = temp->next;
 		temp->next = new;
 		new->back = temp;
-		temp->fork_right = new->fork_left;
-		new->fork_right = (*plist)->fork_left;
+		new->fork_right = temp->fork_left;
+		(*plist)->fork_right = new->fork_left;
 	}
 }

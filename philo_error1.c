@@ -6,7 +6,7 @@
 /*   By: jbax <jbax@student.codam.nl>                 +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/11/17 13:02:06 by jbax          #+#    #+#                 */
-/*   Updated: 2022/11/22 17:45:37 by jbax          ########   odam.nl         */
+/*   Updated: 2022/11/29 18:30:43 by jbax          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,15 +24,10 @@ void	put_s(char *str)
 	i = 0;
 	while (str[i])
 		i++;
-	i = write(2, str, i);
+	i = write(1, str, i);
 	if (i < 1)
 		write(2, "error can't be writen", 21);
 }
-
-// void	put_d(int i)
-// {
-// 	int	t;
-// }
 
 int	check_args(int argc)
 {

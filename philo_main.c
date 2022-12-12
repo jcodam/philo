@@ -6,49 +6,11 @@
 /*   By: jbax <jbax@student.codam.nl>                 +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/11/15 14:54:36 by jbax          #+#    #+#                 */
-/*   Updated: 2022/11/23 17:03:15 by jbax          ########   odam.nl         */
+/*   Updated: 2022/12/12 15:13:03 by jbax          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo_all.h"
-
-int	run_time(struct timeval begin)
-{
-	struct timeval	new;
-	int				i;
-	int				t;
-
-	gettimeofday(&new, 0);
-	t = new.tv_sec - begin.tv_sec;
-	i = ((new.tv_usec + (t * 1000000)) - begin.tv_usec) / 1000;
-	return (i);
-}
-
-int	sleepy(struct timeval og, t_philo_list *plist, int time)
-{
-	struct timeval	base;
-	int				i;
-	int				j;
-
-	i = 1;
-	gettimeofday(&base, 0);
-	while (i)
-	{
-		usleep(100);
-		j = run_time(base);
-		if (j >= time)
-			i = 0;
-		if (run_time(og) >= plist->last_meal + plist->time->t_death)
-		{
-			pthread_mutex_lock(plist->death);
-			*plist->sync = -1;
-			pthread_mutex_unlock(plist->death);
-			printf("time; %d philo %d died\n", run_time(og), plist->philo_id);
-			return (1);
-		}
-	}
-	return (0);
-}
 
 void	*philo_main(void *list)
 {
@@ -58,40 +20,48 @@ void	*philo_main(void *list)
 
 	plist = (t_philo_list *)list;
 	gettimeofday(&ogtime, 0);
+	plist->ogtime = ogtime;
 	i = 1;
+	plist->last_meal = run_time(ogtime);
+	if (!(plist->philo_id % 2))
+		usleep(100);
 	while (i != plist->time->x_eat + 1 && i)
 	{
 		pthread_mutex_lock(plist->fork_right);
 		pthread_mutex_lock(plist->fork_left);
-		printf("time; %d philo %d has taken right fork\n", run_time(ogtime), plist->philo_id);
-		printf("time; %d philo %d has taken left fork\n", run_time(ogtime), plist->philo_id);
+		if (to_late_for_dinner(ogtime, plist, "has taken a fork\n", 1))
+			return (0);
+		if (to_late_for_dinner(ogtime, plist, "has taken a fork\n", 1))
+			return (0);
+		if (to_late_for_dinner(ogtime, plist, "is eating\n", 1))
+			return (0);
 		plist->last_meal = run_time(ogtime);
-		printf("time; %d philo %d is eating\n", plist->last_meal, plist->philo_id);
-		sleepy(ogtime, plist, plist->time->t_eat);
+		if (sleepy(ogtime, plist, plist->time->t_eat, 1))
+			return (0);
 		i++;
-		pthread_mutex_unlock(plist->fork_left);
 		pthread_mutex_unlock(plist->fork_right);
-		printf("time; %d philo %d id sleeping\n", run_time(ogtime), plist->philo_id);
-		sleepy(ogtime, plist, plist->time->t_sleep);
-		printf("time; %d philo %d is thinking\n", run_time(ogtime), plist->philo_id);
+		pthread_mutex_unlock(plist->fork_left);
+		if (to_late_for_dinner(ogtime, plist, "is sleeping\n", 0))
+			return (0);
+		if (sleepy(ogtime, plist, plist->time->t_sleep, 0))
+			return (0);
+		if (to_late_for_dinner(ogtime, plist, "is thinking\n", 0))
+			return (0);
 	}
-	pthread_mutex_lock(plist->death);
-	*plist->sync += 1;
-	if (*plist->sync == plist->time->n_philo)
-		*plist->sync = -1;
-	pthread_mutex_unlock(plist->death);
 	return (0);
 }
 
 int	create_thread(t_philo_list *plist)
 {
 	int	i;
+	int	n;
 
 	i = 0;
-	while (plist && i < plist->time->n_philo)
+	n = plist->time->n_philo;
+	while (plist && i < n)
 	{
-		if (error_table(pthread_create(&plist->thread_id,
-					0, philo_main, plist)))
+		if (pthread_create(&plist->thread_id,
+				0, philo_main, plist))
 		{
 			put_s("create error\n");
 			return (1);
@@ -101,6 +71,12 @@ int	create_thread(t_philo_list *plist)
 	}
 	return (0);
 }
+
+// void	leaks(void)
+// {
+// 	system("leaks -q philo");
+// }
+	// atexit(&leaks);
 
 int	main(int argc, char **argv)
 {
@@ -122,12 +98,18 @@ int	main(int argc, char **argv)
 	}
 	if (create_thread(plist))
 		return (0);
-	while(1)
+	i = 1;
+	while (i < ph.n_philo)
 	{
-		pthread_mutex_lock(plist->death);
-		if (*plist->sync == -1)
-			return (0);
-		pthread_mutex_unlock(plist->death);
+		pthread_join(plist->thread_id, 0);
+		if (plist->next)
+			plist = plist->next;
+		i++;
 	}
+	i = 0;
+	while (plist->back)
+		plist = plist->back;
+	while (plist)
+		philo_del(&plist);
 	return (0);
 }
