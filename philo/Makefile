@@ -2,13 +2,15 @@ NAME=philo
 
 SRC= philo_main.c philo_list.c philo_error1.c
 
-OBF= $(SRC:.c=.o)
+OBF1= $(SRC:.c=.o) $(UTIL1:.c=.o)
+
+OBF= $(addprefix $(OBF_DIR)/, $(OBF1))
 
 HEADER= philo_all.h
 
 UTIL1= ft_atoi.c philo_util.c
 
-UTIL= $(UTIL1:.c=.o)
+OBF_DIR= OBF
 
 CC= gcc
 
@@ -20,23 +22,20 @@ OO= -O3
 
 all:$(NAME)
 
-pr:
-	$(CC) $(CFLAGS) practes practes.c
+$(NAME): $(OBF_DIR) $(OBF1) 
+	$(CC) $(CFLAGS) $@ $(OBF)
 
-pf:
-	rm -f practes
-
-$(NAME): $(OBF) $(UTIL)
-	$(CC) $(CFLAGS) $@ $^
+$(OBF_DIR):
+	mkdir $(OBF_DIR)
 
 %.o: %.c $(HEADER)
-	$(CC) -c $(CFLAGS) $@ $<
+	$(CC) -c $(CFLAGS) $(OBF_DIR)/$@ $<
 
 clean:
-	rm -f $(OBF) $(UTIL)
+	@rm -f $(OBF) $(OBF_DIR)
 
 fclean:
-	@rm -f $(OBF) $(UTIL) $(NAME)
+	@rm -rf $(OBF) $(OBF_DIR) $(NAME)
 
 f: fclean
 

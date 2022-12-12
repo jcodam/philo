@@ -50,3 +50,9 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+
+# my own restrictions
+practes*
+test*
+*.txt
+.vscode

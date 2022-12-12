@@ -6,7 +6,7 @@
 /*   By: jbax <jbax@student.codam.nl>                 +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/11/24 16:25:57 by jbax          #+#    #+#                 */
-/*   Updated: 2022/12/05 15:17:52 by jbax          ########   odam.nl         */
+/*   Updated: 2022/12/12 17:23:32 by jbax          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,13 @@ int	run_time(struct timeval begin)
 	return (i);
 }
 
+int	unlock_fork(t_philo_list *plist)
+{
+	pthread_mutex_unlock(plist->fork_right);
+	pthread_mutex_unlock(plist->fork_left);
+	return (0);
+}
+
 int	to_late_for_dinner(struct timeval og, t_philo_list *plist,
 		char *str, int f_switch)
 {
@@ -33,8 +40,7 @@ int	to_late_for_dinner(struct timeval og, t_philo_list *plist,
 		pthread_mutex_unlock(plist->death);
 		if (f_switch)
 		{
-			pthread_mutex_unlock(plist->fork_right);
-			pthread_mutex_unlock(plist->fork_left);
+			unlock_fork(plist);
 		}
 		return (1);
 	}
@@ -45,8 +51,7 @@ int	to_late_for_dinner(struct timeval og, t_philo_list *plist,
 		printf("%d %d died\n", run_time(og), plist->philo_id);
 		if (f_switch)
 		{
-			pthread_mutex_unlock(plist->fork_right);
-			pthread_mutex_unlock(plist->fork_left);
+			unlock_fork(plist);
 		}
 		return (1);
 	}
@@ -72,6 +77,27 @@ int	sleepy(struct timeval og, t_philo_list *plist, int time, int f_switch)
 		j = run_time(base);
 		if (j >= time)
 			i = 0;
+	}
+	return (0);
+}
+
+int	create_thread(t_philo_list *plist)
+{
+	int	i;
+	int	n;
+
+	i = 0;
+	n = plist->time->n_philo;
+	while (plist && i < n)
+	{
+		if (pthread_create(&plist->thread_id,
+				0, philo_main, plist))
+		{
+			put_s("create error\n");
+			return (1);
+		}
+		plist = plist->next;
+		i++;
 	}
 	return (0);
 }

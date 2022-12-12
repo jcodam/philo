@@ -6,7 +6,7 @@
 /*   By: jbax <jbax@student.codam.nl>                 +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/11/17 12:43:02 by jbax          #+#    #+#                 */
-/*   Updated: 2022/12/12 15:11:20 by jbax          ########   odam.nl         */
+/*   Updated: 2022/12/12 17:15:11 by jbax          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,17 +53,10 @@ t_philo_list	*philo_new(t_philo_time *time, int id, int *synk)
 		return (0);
 	return (plist);
 }
-/*   1
-    / \
-   f   f
-  / .   \
- 4 .     2
-  \ .   /
-   f   f
-    \ /
-     3
-*/
 
+		// if (temp->back)
+		// else
+		// 	(*plist)->back = 0;
 int	philo_del(t_philo_list **plist)
 {
 	t_philo_list	*temp;
@@ -74,10 +67,7 @@ int	philo_del(t_philo_list **plist)
 	if ((*plist)->next)
 	{
 		(*plist) = (*plist)->next;
-		if (temp->back)
-			(*plist)->back = temp->back;
-		else
-			(*plist)->back = 0;
+		(*plist)->back = temp->back;
 	}
 	else if (!temp->back)
 	{

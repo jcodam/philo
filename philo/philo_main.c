@@ -6,25 +6,39 @@
 /*   By: jbax <jbax@student.codam.nl>                 +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/11/15 14:54:36 by jbax          #+#    #+#                 */
-/*   Updated: 2022/12/12 15:13:03 by jbax          ########   odam.nl         */
+/*   Updated: 2022/12/12 18:06:09 by jbax          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo_all.h"
 
-void	*philo_main(void *list)
+static void	*philo_stomach(void *list)
 {
 	t_philo_list	*plist;
-	struct timeval	ogtime;
-	int				i;
 
 	plist = (t_philo_list *)list;
-	gettimeofday(&ogtime, 0);
-	plist->ogtime = ogtime;
-	i = 1;
-	plist->last_meal = run_time(ogtime);
-	if (!(plist->philo_id % 2))
-		usleep(100);
+	while (1)
+	{
+		pthread_mutex_lock(plist->time_mutex);
+		if (plist->last_meal == -1)
+		{
+			pthread_mutex_unlock(plist->time_mutex);
+			return (0);
+		}
+		if (to_late_for_dinner(plist->ogtime, plist, 0, 0))
+		{
+			pthread_mutex_unlock(plist->time_mutex);
+			return (0);
+		}
+		pthread_mutex_unlock(plist->time_mutex);
+		usleep(5000);
+	}
+	return (0);
+}
+
+static int	eet_sleep_think_repeat(int i, t_philo_list *plist,
+			struct timeval ogtime)
+{
 	while (i != plist->time->x_eat + 1 && i)
 	{
 		pthread_mutex_lock(plist->fork_right);
@@ -35,12 +49,13 @@ void	*philo_main(void *list)
 			return (0);
 		if (to_late_for_dinner(ogtime, plist, "is eating\n", 1))
 			return (0);
+		pthread_mutex_lock(plist->time_mutex);
 		plist->last_meal = run_time(ogtime);
+		pthread_mutex_unlock(plist->time_mutex);
 		if (sleepy(ogtime, plist, plist->time->t_eat, 1))
 			return (0);
 		i++;
-		pthread_mutex_unlock(plist->fork_right);
-		pthread_mutex_unlock(plist->fork_left);
+		unlock_fork(plist);
 		if (to_late_for_dinner(ogtime, plist, "is sleeping\n", 0))
 			return (0);
 		if (sleepy(ogtime, plist, plist->time->t_sleep, 0))
@@ -48,35 +63,56 @@ void	*philo_main(void *list)
 		if (to_late_for_dinner(ogtime, plist, "is thinking\n", 0))
 			return (0);
 	}
+	return (1);
+}
+
+void	*philo_main(void *list)
+{
+	t_philo_list	*plist;
+	int				i;
+	pthread_t		sub_tread;
+
+	plist = (t_philo_list *)list;
+	if (pthread_create(&sub_tread,
+			0, philo_stomach, plist))
+	{
+		put_s("create error\n");
+		return (0);
+	}
+	pthread_mutex_lock(plist->time_mutex);
+	gettimeofday(&plist->ogtime, 0);
+	i = 1;
+	plist->last_meal = run_time(plist->ogtime);
+	pthread_mutex_unlock(plist->time_mutex);
+	if (!(plist->philo_id % 2))
+		usleep(100);
+	eet_sleep_think_repeat(i, plist, plist->ogtime);
+	pthread_mutex_lock(plist->time_mutex);
+	plist->last_meal = -1;
+	pthread_mutex_unlock(plist->time_mutex);
+	pthread_join(sub_tread, 0);
 	return (0);
 }
 
-int	create_thread(t_philo_list *plist)
+static void	wait_to_join(t_philo_list *plist)
 {
 	int	i;
-	int	n;
 
-	i = 0;
-	n = plist->time->n_philo;
-	while (plist && i < n)
+	i = 1;
+	while (i < plist->time->n_philo)
 	{
-		if (pthread_create(&plist->thread_id,
-				0, philo_main, plist))
-		{
-			put_s("create error\n");
-			return (1);
-		}
-		plist = plist->next;
+		pthread_join(plist->thread_id, 0);
+		if (plist->next)
+			plist = plist->next;
 		i++;
 	}
-	return (0);
 }
 
 // void	leaks(void)
 // {
 // 	system("leaks -q philo");
 // }
-	// atexit(&leaks);
+// 	atexit(&leaks);
 
 int	main(int argc, char **argv)
 {
@@ -98,18 +134,10 @@ int	main(int argc, char **argv)
 	}
 	if (create_thread(plist))
 		return (0);
-	i = 1;
-	while (i < ph.n_philo)
-	{
-		pthread_join(plist->thread_id, 0);
-		if (plist->next)
-			plist = plist->next;
-		i++;
-	}
-	i = 0;
-	while (plist->back)
-		plist = plist->back;
+	wait_to_join(plist);
 	while (plist)
 		philo_del(&plist);
 	return (0);
 }
+	// while (plist->back)
+	// 	plist = plist->back;
