@@ -53,6 +53,8 @@ dkms.conf
 
 # my own restrictions
 practes*
+OBF
 test*
+*ester
 *.txt
 .vscode

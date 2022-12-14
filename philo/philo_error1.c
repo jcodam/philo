@@ -6,7 +6,7 @@
 /*   By: jbax <jbax@student.codam.nl>                 +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/11/17 13:02:06 by jbax          #+#    #+#                 */
-/*   Updated: 2022/11/29 18:30:43 by jbax          ########   odam.nl         */
+/*   Updated: 2022/12/14 16:39:20 by jbax          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@
 // 22	EINVAL	Invalid argument
 // 35	EDEADLK	Resource deadlock would occur
 #include <unistd.h>
+#include "philo_all.h"
 
 void	put_s(char *str)
 {
@@ -61,4 +62,24 @@ int	error_table(int error)
 	else
 		return (0);
 	return (1);
+}
+
+int	write_error(char *message, int error)
+{
+	put_s(message);
+	return (error);
+}
+
+void	what_error(t_philo_time *ph, int *error, int argc)
+{
+	if ((ph->n_philo) <= 0)
+		*error = write_error("number philo's smaller than one\n", 1);
+	if ((ph->t_death) <= 0)
+		*error = write_error("time to die is smaller than one\n", 1);
+	if ((ph->t_eat) <= 0)
+		*error = write_error("time to eat is smaller than one\n", 1);
+	if ((ph->t_sleep) <= 0)
+		*error = write_error("time to sleep is smaller than one\n", 1);
+	if (argc == 6 && (ph->x_eat) <= 0)
+		*error = write_error("times to eat is smaller than one\n", 1);
 }

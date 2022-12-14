@@ -6,7 +6,7 @@
 /*   By: jbax <jbax@student.codam.nl>                 +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/11/15 15:34:52 by jbax          #+#    #+#                 */
-/*   Updated: 2022/12/12 17:28:12 by jbax          ########   odam.nl         */
+/*   Updated: 2022/12/14 16:39:45 by jbax          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,5 +60,7 @@ int				check_args(int argc);
 int				unlock_fork(t_philo_list *plist);
 int				create_thread(t_philo_list *plist);
 void			*philo_main(void *list);
+int				write_error(char *message, int error);
+void			what_error(t_philo_time *ph, int *error, int argc);
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: jbax <jbax@student.codam.nl>                 +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/11/15 14:54:36 by jbax          #+#    #+#                 */
-/*   Updated: 2022/12/12 18:06:09 by jbax          ########   odam.nl         */
+/*   Updated: 2022/12/14 16:19:01 by jbax          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -123,7 +123,8 @@ int	main(int argc, char **argv)
 
 	if (check_args(argc))
 		return (0);
-	time_new(argc, argv, &ph);
+	if (time_new(argc, argv, &ph))
+		return (0);
 	i = 0;
 	j = 0;
 	plist = 0;
@@ -131,6 +132,8 @@ int	main(int argc, char **argv)
 	{
 		i++;
 		philo_addback(&plist, philo_new(&ph, i, &j));
+		if (!plist)
+			return (0);
 	}
 	if (create_thread(plist))
 		return (0);
@@ -139,5 +142,3 @@ int	main(int argc, char **argv)
 		philo_del(&plist);
 	return (0);
 }
-	// while (plist->back)
-	// 	plist = plist->back;
