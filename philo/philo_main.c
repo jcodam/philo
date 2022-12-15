@@ -6,7 +6,7 @@
 /*   By: jbax <jbax@student.codam.nl>                 +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/11/15 14:54:36 by jbax          #+#    #+#                 */
-/*   Updated: 2022/12/14 16:19:01 by jbax          ########   odam.nl         */
+/*   Updated: 2022/12/15 16:41:08 by jbax          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,7 +98,7 @@ static void	wait_to_join(t_philo_list *plist)
 {
 	int	i;
 
-	i = 1;
+	i = 0;
 	while (i < plist->time->n_philo)
 	{
 		pthread_join(plist->thread_id, 0);
