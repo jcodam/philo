@@ -2,7 +2,7 @@ NAME=philo
 
 SRC= philo_main.c philo_list.c philo_error1.c
 
-OBF1= $(SRC:.c=.o) $(UTIL1:.c=.o)
+OBF1= $(SRC:%.c=$(OBF_DIR)/%.o) $(UTIL1:%.c=$(OBF_DIR)/%.o)
 
 OBF= $(addprefix $(OBF_DIR)/, $(OBF1))
 
@@ -23,13 +23,13 @@ OO= -O3
 all:$(NAME)
 
 $(NAME): $(OBF_DIR) $(OBF1) 
-	$(CC) $(CFLAGS) $@ $(OBF)
+	$(CC) $(CFLAGS) $@ $(OBF1)
 
 $(OBF_DIR):
 	mkdir $(OBF_DIR)
 
-%.o: %.c $(HEADER)
-	$(CC) -c $(CFLAGS) $(OBF_DIR)/$@ $<
+$(OBF_DIR)/%.o: %.c $(HEADER)
+	$(CC) -c $(CFLAGS) $@ $<
 
 clean:
 	@rm -f $(OBF) $(OBF_DIR)

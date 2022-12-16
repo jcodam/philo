@@ -6,7 +6,7 @@
 /*   By: jbax <jbax@student.codam.nl>                 +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/11/17 13:02:06 by jbax          #+#    #+#                 */
-/*   Updated: 2022/12/14 16:39:20 by jbax          ########   odam.nl         */
+/*   Updated: 2022/12/16 20:12:00 by jbax          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,32 @@
 // 35	EDEADLK	Resource deadlock would occur
 #include <unistd.h>
 #include "philo_all.h"
+
+int	time_new(int argc, char **argv, t_philo_time *ph)
+{
+	int	error;
+
+	error = 0;
+	ph->n_philo = ft_atoi(argv[1]);
+	ph->t_death = ft_atoi(argv[2]);
+	ph->t_eat = ft_atoi(argv[3]);
+	ph->t_sleep = ft_atoi(argv[4]);
+	if (argc == 6)
+		ph->x_eat = ft_atoi(argv[5]);
+	else
+		ph->x_eat = -3;
+	what_error(ph, &error, argc);
+	if (error == 1)
+		return (1);
+	if (ph->n_philo == 1)
+	{
+		printf("0 1 has taken a fork\n");
+		usleep(ph->t_death * 1000);
+		printf("%i 1 died\n", ph->t_death);
+		return (1);
+	}
+	return (0);
+}
 
 void	put_s(char *str)
 {
@@ -43,25 +69,6 @@ int	check_args(int argc)
 		return (1);
 	}
 	return (0);
-}
-
-int	error_table(int error)
-{
-	if (error == 1)
-		put_s("error code 1\n");
-	else if (error == 11)
-		put_s("error code 11\n");
-	else if (error == 12)
-		put_s("error code 12\n");
-	else if (error == 22)
-		put_s("error code 22\n");
-	else if (error == 35)
-		put_s("error code 35\n");
-	else if (error)
-		put_s("error code ?\n");
-	else
-		return (0);
-	return (1);
 }
 
 int	write_error(char *message, int error)

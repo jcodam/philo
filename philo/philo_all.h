@@ -6,7 +6,7 @@
 /*   By: jbax <jbax@student.codam.nl>                 +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/11/15 15:34:52 by jbax          #+#    #+#                 */
-/*   Updated: 2022/12/14 16:39:45 by jbax          ########   odam.nl         */
+/*   Updated: 2022/12/16 17:55:14 by jbax          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,6 @@ int				run_time(struct timeval begin);
 int				time_new(int argc, char **argv, t_philo_time *ph);
 int				ft_atoi(const char *str);
 void			put_s(char *str);
-int				error_table(int error);
 t_philo_list	*philo_new(t_philo_time *time, int id, int *synk);
 void			philo_addback(t_philo_list **plist, t_philo_list *new);
 int				philo_del(t_philo_list **plist);

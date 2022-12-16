@@ -6,7 +6,7 @@
 /*   By: jbax <jbax@student.codam.nl>                 +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/11/15 14:54:36 by jbax          #+#    #+#                 */
-/*   Updated: 2022/12/15 16:41:08 by jbax          ########   odam.nl         */
+/*   Updated: 2022/12/16 17:49:06 by jbax          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@ static void	*philo_stomach(void *list)
 	t_philo_list	*plist;
 
 	plist = (t_philo_list *)list;
+	usleep(900);
 	while (1)
 	{
 		pthread_mutex_lock(plist->time_mutex);
@@ -85,7 +86,7 @@ void	*philo_main(void *list)
 	plist->last_meal = run_time(plist->ogtime);
 	pthread_mutex_unlock(plist->time_mutex);
 	if (!(plist->philo_id % 2))
-		usleep(100);
+		usleep(900);
 	eet_sleep_think_repeat(i, plist, plist->ogtime);
 	pthread_mutex_lock(plist->time_mutex);
 	plist->last_meal = -1;
