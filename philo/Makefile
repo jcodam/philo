@@ -43,13 +43,13 @@ re:
 	@$(MAKE) fclean
 	@$(MAKE) all
 
-run1:
+run1: $(NAME)
 	@./$(NAME) 5 700 250 249 10
 
-run:
+run: $(NAME)
 	@./$(NAME) 5 760 250 200 5
 
-run200:
+run200: $(NAME)
 	@./$(NAME) 200 410 200 200
 
 bug:

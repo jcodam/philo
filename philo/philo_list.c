@@ -6,18 +6,18 @@
 /*   By: jbax <jbax@student.codam.nl>                 +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/11/17 12:43:02 by jbax          #+#    #+#                 */
-/*   Updated: 2022/12/16 20:08:39 by jbax          ########   odam.nl         */
+/*   Updated: 2022/12/19 14:48:57 by jbax          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo_all.h"
 
-static int	free_philo(t_philo_list **plist, int n_free)
+static int	free_philo(t_philo_list **plist, int n_free, pthread_mutex_t *death)
 {
-	if (n_free > 7)
-		pthread_mutex_destroy((*plist)->death);
-	if (n_free > 6)
-		free((*plist)->death);
+	if (n_free > 7 && death)
+		pthread_mutex_destroy(death);
+	if (n_free > 6 && death)
+		free(death);
 	if (n_free > 5)
 		pthread_mutex_destroy((*plist)->time_mutex);
 	if (n_free > 4)
@@ -44,19 +44,19 @@ static int	malloc_philo(t_philo_list **plist)
 	(*plist)->fork_left = malloc(sizeof(pthread_mutex_t));
 	if (!(*plist)->fork_left)
 	{
-		free_philo(plist, 2);
+		free_philo(plist, 2, 0);
 		return (1);
 	}
 	(*plist)->time_mutex = malloc(sizeof(pthread_mutex_t));
 	if (!(*plist)->time_mutex)
 	{
-		free_philo(plist, 3);
+		free_philo(plist, 3, 0);
 		return (1);
 	}
 	if (pthread_mutex_init((*plist)->fork_left, 0))
-		return (free_philo(plist, 4));
+		return (free_philo(plist, 4, 0));
 	if (pthread_mutex_init((*plist)->time_mutex, 0))
-		return (free_philo(plist, 5));
+		return (free_philo(plist, 5, 0));
 	return (0);
 }
 
@@ -71,12 +71,12 @@ t_philo_list	*philo_new(t_philo_time *time, int id, int *synk)
 	{
 		death = malloc(sizeof(pthread_mutex_t));
 		if (!death)
-			free_philo(&plist, 6);
+			free_philo(&plist, 6, 0);
 		if (!death)
 			return (0);
 		if (pthread_mutex_init(death, 0))
 		{
-			free_philo(&plist, 7);
+			free_philo(&plist, 7, death);
 			return (0);
 		}
 	}
